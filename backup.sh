@@ -21,7 +21,7 @@ done
 
 if [ -n "$MAX_BACKUPS" ]
 then
-  while [ $(find /backup -maxdepth 1 -name "*.sql.gz" | wc -l) -gt "$MAX_BACKUPS" ];
+  while [ "$(find /backup -maxdepth 1 -name "*.sql.gz" | wc -l)" -gt "$MAX_BACKUPS" ];
   do
     TARGET=$(find /backup -maxdepth 1 -name "*.sql.gz" | sort | head -n 1)
     echo "Backup $TARGET is deleted"

@@ -1,0 +1,10 @@
+sudo: required
+dist: xenial
+language: bash
+
+before_script:
+  - sudo apt-get -qq update
+  - sudo apt-get install -y devscripts shellcheck
+
+script:
+  - make test

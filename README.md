@@ -1,6 +1,8 @@
+[![Build Status](https://travis-ci.org/fradelg/docker-mysql-cron-backup.svg?branch=master)](https://travis-ci.org/fradelg/docker-mysql-cron-backup)
+
 # mysql-cron-backup
 
-This image runs mysqldump to backup database periodically using cron. Data is dumped to the container folder `/backup`
+This image runs mysqldump to backup your databases periodically using cron. Data is dumped to `/backup` so you can mount your backup volumes in this path.
 
 ## Usage:
 

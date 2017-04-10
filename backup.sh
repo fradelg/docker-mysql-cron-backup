@@ -25,7 +25,7 @@ then
   do
     TARGET=$(find /backup -maxdepth 1 -name "*.sql.gz" | sort | head -n 1)
     echo "Backup $TARGET is deleted"
-    rm -rf /backup/"$TARGET"
+    rm -rf "$TARGET"
   done
 fi
 

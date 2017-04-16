@@ -5,7 +5,8 @@
 DATE=$(date +%Y%m%d%H%M)
 echo "=> Backup started at $DATE"
 databases=$(mysql -u "$MYSQL_USER" -p"$MYSQL_PASS" -e "SHOW DATABASES;" | tr -d "| " | grep -v Database)
-for db in $databases; do
+for db in $databases
+do
   if [[ "$db" != "information_schema" ]] && [[ "$db" != "performance_schema" ]] && [[ "$db" != "mysql" ]] && [[ "$db" != _* ]]
   then
     echo "Dumping database: $db"
@@ -21,7 +22,7 @@ done
 
 if [ -n "$MAX_BACKUPS" ]
 then
-  while [ "$(find /backup -maxdepth 1 -name "*.sql.gz" | wc -l)" -gt "$MAX_BACKUPS" ];
+  while [ "$(find /backup -maxdepth 1 -name "*.sql.gz" | wc -l)" -gt "$MAX_BACKUPS" ]
   do
     TARGET=$(find /backup -maxdepth 1 -name "*.sql.gz" | sort | head -n 1)
     echo "Backup $TARGET is deleted"

@@ -10,7 +10,7 @@ for db in $databases; do
   then
     echo "Dumping database: $db"
     FILENAME=/backup/$DATE.$db.sql
-    if mysqldump -h "$MYSQL_HOST" -P "$MYSQL_PORT" -u "$MYSQL_USER" -p"$MYSQL_PASS" "$db" > "$FILENAME"
+    if mysqldump -h "$MYSQL_HOST" -P "$MYSQL_PORT" -u "$MYSQL_USER" -p"$MYSQL_PASS" --databases "$db" > "$FILENAME"
     then
       gzip -f "$FILENAME"
     else

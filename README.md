@@ -2,15 +2,15 @@
 
 # mysql-cron-backup
 
-This image runs mysqldump to backup your databases periodically using cron. Data is dumped to `/backup` so you can mount your backup volumes in this path.
+This docker image runs mysqldump to backup your databases periodically using cron task manager. Backups are placed in `/backup` so you can mount your backup docker volume in this path.
 
 ## Usage:
 
-  docker run -d \
-    --env MYSQL_USER=admin \
-    --env MYSQL_PASS=password \
+  docker container run -d \
+    --env MYSQL_USER=root \
+    --env MYSQL_PASS=my_password \
     --link mysql
-    --volume /path/to/my/host/folder:/backup
+    --volume /path/to/my/backup/folder:/backup
     fradelg/mysql-backup
 
 ## Variables
@@ -27,10 +27,10 @@ This image runs mysqldump to backup your databases periodically using cron. Data
 
 ## Restore from a backup
 
-See the list of backups, you can run:
+See the list of backups in your running docker container, just write in your favorite terminal:
 
-    docker exec backup ls /backup
+    docker container exec backup ls /backup
 
-To restore database from a certain backup, simply run:
+To restore a database from a certain backup, simply run:
 
-    docker exec backup /restore.sh /backup/2015.08.06.171901
+    docker container exec backup /restore.sh /backup/201708060500.my_db.sql.gz

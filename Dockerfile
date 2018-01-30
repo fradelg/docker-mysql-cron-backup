@@ -1,4 +1,4 @@
-FROM alpine:3.5
+FROM alpine:3.7
 LABEL maintainer "Fco. Javier Delgado del Hoyo <frandelhoyo@gmail.com>"
 
 RUN apk add --update bash mysql-client gzip && rm -rf /var/cache/apk/* && mkdir /backup

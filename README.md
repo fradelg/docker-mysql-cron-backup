@@ -11,7 +11,7 @@ This docker image runs mysqldump to backup your databases periodically using cro
     --env MYSQL_PASS=my_password \
     --link mysql
     --volume /path/to/my/backup/folder:/backup
-    fradelg/mysql-backup
+    fradelg/mysql-cron-backup
 
 ## Variables
 

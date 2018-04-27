@@ -20,6 +20,7 @@ This docker image runs mysqldump to backup your databases periodically using cro
     MYSQL_USER      the username of your mysql database
     MYSQL_PASS      the password of your mysql database
     MYSQL_DB        the database name to dump. Default: `--all-databases`
+		MYSQLDUMP_OPTS  command line arguments to pass to mysqldump. Example: `--single-transaction`
     CRON_TIME       the interval of cron job to run mysqldump. `0 0 * * *` by default, which is every day at 00:00
     MAX_BACKUPS     the number of backups to keep. When reaching the limit, the old backup will be discarded. No limit by default
     INIT_BACKUP     if set, create a backup when the container starts

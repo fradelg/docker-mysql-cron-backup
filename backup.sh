@@ -15,7 +15,7 @@ do
     if mysqldump -h "$MYSQL_HOST" -P "$MYSQL_PORT" -u "$MYSQL_USER" -p"$MYSQL_PASS" --databases "$db" $MYSQLDUMP_OPTS > "$FILENAME"
     then
       gzip -f "$FILENAME"
-      rm "$LATEST"
+      rm "$LATEST" 2> /dev/null
       ln -s "$FILENAME" "$LATEST"
     else
       rm -rf "$FILENAME"

@@ -11,9 +11,12 @@ do
   then
     echo "Dumping database: $db"
     FILENAME=/backup/$DATE.$db.sql
+    LATEST=/backup/latest.$db.sql.gz
     if mysqldump -h "$MYSQL_HOST" -P "$MYSQL_PORT" -u "$MYSQL_USER" -p"$MYSQL_PASS" --databases "$db" $MYSQLDUMP_OPTS > "$FILENAME"
     then
       gzip -f "$FILENAME"
+      rm "$LATEST" 2> /dev/null
+      ln -s "$FILENAME" "$LATEST"
     else
       rm -rf "$FILENAME"
     fi
@@ -22,9 +25,9 @@ done
 
 if [ -n "$MAX_BACKUPS" ]
 then
-  while [ "$(find /backup -maxdepth 1 -name "*.sql.gz" | wc -l)" -gt "$MAX_BACKUPS" ]
+  while [ "$(find /backup -maxdepth 1 -name "*.sql.gz" -type f | wc -l)" -gt "$MAX_BACKUPS" ]
   do
-    TARGET=$(find /backup -maxdepth 1 -name "*.sql.gz" | sort | head -n 1)
+    TARGET=$(find /backup -maxdepth 1 -name "*.sql.gz" -type f | sort | head -n 1)
     echo "Backup $TARGET is deleted"
     rm -rf "$TARGET"
   done

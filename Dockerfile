@@ -13,8 +13,9 @@ RUN wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSI
 
 ENV CRON_TIME="0 3 * * sun" \
     MYSQL_HOST="mysql" \
-    MYSQL_PORT="3306"
+    MYSQL_PORT="3306" \
+    TIMEOUT="10s"
 
 VOLUME ["/backup"]
 
-CMD dockerize -wait tcp://${MYSQL_HOST}:3306 /run.sh
+CMD dockerize -wait tcp://${MYSQL_HOST}:${MYSQL_PORT} -timeout ${TIMEOUT} /run.sh

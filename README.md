@@ -27,6 +27,7 @@ docker container run -d \
 - `MAX_BACKUPS`: The number of backups to keep. When reaching the limit, the old backup will be discarded. No limit by default.
 - `INIT_BACKUP`: If set, create a backup when the container starts.
 - `INIT_RESTORE_LATEST`: Ff set, restores latest backup.
+- `TIMEOUT`: Wait a given number of seconds for the database to be ready and make the first backup, `10s` by default. After that time, the initial attempt for backup gives up and only the Cron job will try to make a backup.
 
 If you want to make this image the perfect companion of your MySQL container, use [docker-compose](https://docs.docker.com/compose/). You can add more services that will be able to connect to the MySQL image using the name `my_mariadb`, note that you only expose the port `3306` internally to the servers and not to the host:
 

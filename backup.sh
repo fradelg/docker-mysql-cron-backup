@@ -12,7 +12,7 @@ do
     echo "Dumping database: $db"
     FILENAME=/backup/$DATE.$db.sql
     LATEST=/backup/latest.$db.sql.gz
-    if mysqldump -h "$MYSQL_HOST" -P "$MYSQL_PORT" -u "$MYSQL_USER" -p"$MYSQL_PASS" --databases "$db" $MYSQLDUMP_OPTS > "$FILENAME"
+    if mysqldump -h "$MYSQL_HOST" -P "$MYSQL_PORT" -u "$MYSQL_USER" -p"$MYSQL_PASS" --databases "$db" "$MYSQLDUMP_OPTS" > "$FILENAME"
     then
       gzip -f "$FILENAME"
       rm "$LATEST" 2> /dev/null

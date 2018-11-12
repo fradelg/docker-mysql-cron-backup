@@ -16,7 +16,7 @@ do
     then
       gzip -f "$FILENAME"
       rm "$LATEST" 2> /dev/null
-      ln -s "$FILENAME" "$LATEST"
+      cd backup && ln -s $(basename "$FILENAME".gz) $(basename "$LATEST") && cd ..
     else
       rm -rf "$FILENAME"
     fi

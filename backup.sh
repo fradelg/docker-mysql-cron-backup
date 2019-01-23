@@ -17,7 +17,7 @@ do
       gzip -f "$FILENAME"
       echo "==> Creating symlink to latest backup: $(basename "$FILENAME".gz)"
       rm "$LATEST" 2> /dev/null
-      cd backup && ln -s $(basename "$FILENAME".gz) $(basename "$LATEST") && cd ..
+      cd /backup && ln -s $(basename "$FILENAME".gz) $(basename "$LATEST") && cd -
     else
       rm -rf "$FILENAME"
     fi

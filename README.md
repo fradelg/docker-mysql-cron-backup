@@ -62,7 +62,7 @@ services:
       - MAX_BACKUPS=15
       - INIT_BACKUP=0
       # Every day at 03:00
-      - CRON_TIME=* 3 * * *
+      - CRON_TIME=0 3 * * *
     restart: unless-stopped
 
 ```

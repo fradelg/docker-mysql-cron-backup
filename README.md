@@ -40,19 +40,18 @@ services:
     expose:
       - 3306
     volumes:
+      - data:/var/lib/mysql
       # If there is not scheme, restore the last created backup (if exists)
       - ${VOLUME_PATH}/backup/latest.${DATABASE_NAME}.sql.gz:/docker-entrypoint-initdb.d/database.sql.gz
     environment:
       - MYSQL_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
       - MYSQL_DATABASE=${DATABASE_NAME}
-      - MYSQL_USER=${WORDPRESS_DB_USER}
-      - MYSQL_PASSWORD=${WORDPRESS_DB_PASSWORD}
     restart: unless-stopped
 
   mysql-cron-backup:
     image: fradelg/mysql-cron-backup
     depends_on:
-      - my_mariadb
+      - mariadb
     volumes:
       - ${VOLUME_PATH}/backup:/backup
     environment:
@@ -65,6 +64,8 @@ services:
       - CRON_TIME=0 3 * * *
     restart: unless-stopped
 
+volumes:
+  data:
 ```
 
 ## Restore from a backup

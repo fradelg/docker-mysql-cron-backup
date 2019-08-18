@@ -1,0 +1,33 @@
+version: "2"
+services:
+  mariadb:
+    image: mariadb:10
+    container_name: my_mariadb
+    expose:
+      - 3306
+    volumes:
+      - data:/var/lib/mysql
+      - ${VOLUME_PATH}/backup:/backup
+    environment:
+      - MYSQL_DATABASE=${DATABASE_NAME}
+      - MYSQL_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
+    restart: unless-stopped
+
+  backup:
+    build: .
+    image: fradelg/mysql-cron-backup
+    depends_on:
+      - mariadb
+    volumes:
+      - ${VOLUME_PATH}/backup:/backup
+    environment:
+      - MYSQL_HOST=my_mariadb
+      - MYSQL_USER=root
+      - MYSQL_PASS=${MARIADB_ROOT_PASSWORD}
+      - MAX_BACKUPS=1
+      - INIT_BACKUP=1
+      - CRON_TIME=0 0 * * *
+    restart: unless-stopped
+  
+volumes: 
+  data:

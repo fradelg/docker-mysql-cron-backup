@@ -2,7 +2,7 @@
 touch /mysql_backup.log
 tail -F /mysql_backup.log &
 
-if [ -n "${INIT_BACKUP}" ]; then
+if [ "${INIT_BACKUP}" -gt "0" ]; then
   echo "=> Create a backup on the startup"
   /backup.sh
 elif [ -n "${INIT_RESTORE_LATEST}" ]; then

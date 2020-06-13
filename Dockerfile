@@ -3,10 +3,13 @@ LABEL maintainer "Fco. Javier Delgado del Hoyo <frandelhoyo@gmail.com>"
 
 RUN apk add --update bash mysql-client gzip openssl && rm -rf /var/cache/apk/*
 
-ENV DOCKERIZE_VERSION v0.6.1
-RUN wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-alpine-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
-    && tar -C /usr/local/bin -xzvf dockerize-alpine-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
-    && rm dockerize-alpine-linux-amd64-$DOCKERIZE_VERSION.tar.gz
+ARG OS=alpine-linux
+ARG ARCH=amd64
+ARG DOCKERIZE_VERSION=v0.6.1
+
+RUN wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-$OS-$ARCH-$DOCKERIZE_VERSION.tar.gz \
+    && tar -C /usr/local/bin -xzvf dockerize-$OS-$ARCH-$DOCKERIZE_VERSION.tar.gz \
+    && rm dockerize-$OS-$ARCH-$DOCKERIZE_VERSION.tar.gz
 
 ENV CRON_TIME="0 3 * * sun" \
     MYSQL_HOST="mysql" \

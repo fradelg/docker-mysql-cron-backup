@@ -1,6 +1,7 @@
 #!/bin/bash
 [ -z "${MYSQL_USER}" ] && { echo "=> MYSQL_USER cannot be empty" && exit 1; }
 [ -z "${MYSQL_PASS:=$MYSQL_PASSWORD}" ] && { echo "=> MYSQL_PASS cannot be empty" && exit 1; }
+[ -z "${GZIP_LEVEL}" ] && { GZIP_LEVEL=6; }
 
 DATE=$(date +%Y%m%d%H%M)
 echo "=> Backup started at $(date "+%Y-%m-%d %H:%M:%S")"
@@ -15,7 +16,7 @@ do
     LATEST=/backup/latest.$db.sql.gz
     if mysqldump -h "$MYSQL_HOST" -P "$MYSQL_PORT" -u "$MYSQL_USER" -p"$MYSQL_PASS" --databases "$db" $MYSQLDUMP_OPTS > "$FILENAME"
     then
-      gzip -f "$FILENAME"
+      gzip "-$GZIP_LEVEL" -f "$FILENAME"
       echo "==> Creating symlink to latest backup: $(basename "$FILENAME".gz)"
       rm "$LATEST" 2> /dev/null
       cd /backup && ln -s $(basename "$FILENAME".gz) $(basename "$LATEST") && cd -

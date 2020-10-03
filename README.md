@@ -23,7 +23,7 @@ docker container run -d \
 - `MYSQL_PASS`: The password of your mysql database.
 - `MYSQL_DB`: The database name to dump. Default: `--all-databases`.
 - `MYSQLDUMP_OPTS`: Command line arguments to pass to mysqldump. Example: `--single-transaction`.
-- `CRON_TIME`: The interval of cron job to run mysqldump. `0 3 * * sun` by default, which is every Sunday at 03:00.
+- `CRON_TIME`: The interval of cron job to run mysqldump. `0 3 * * sun` by default, which is every Sunday at 03:00. It uses UTC timezone.
 - `MAX_BACKUPS`: The number of backups to keep. When reaching the limit, the old backup will be discarded. No limit by default.
 - `INIT_BACKUP`: If set, create a backup when the container starts.
 - `INIT_RESTORE_LATEST`: If set, restores latest backup.

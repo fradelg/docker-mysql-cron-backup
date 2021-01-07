@@ -1,7 +1,7 @@
 FROM alpine:3.12
 LABEL maintainer "Fco. Javier Delgado del Hoyo <frandelhoyo@gmail.com>"
 
-RUN apk add --update tzdata bash mysql-client gzip openssl && rm -rf /var/cache/apk/*
+RUN apk add --update tzdata bash mysql-client gzip openssl mariadb-connector-c && rm -rf /var/cache/apk/*
 
 ARG OS=alpine-linux
 ARG ARCH=amd64

@@ -19,7 +19,7 @@ do
       gzip "-$GZIP_LEVEL" -f "$FILENAME"
       echo "==> Creating symlink to latest backup: $(basename "$FILENAME".gz)"
       rm "$LATEST" 2> /dev/null
-      cd /backup && ln -s $(basename "$FILENAME".gz) $(basename "$LATEST") && cd -
+      cd /backup || exit && ln -s $(basename "$FILENAME".gz) $(basename "$LATEST") && cd -
       DB_COUNTER=$(( DB_COUNTER + 1 ))
     else
       rm -rf "$FILENAME"

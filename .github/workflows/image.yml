@@ -16,11 +16,12 @@ jobs:
         uses: actions/checkout@v2
       - name: Test
         run: sudo apt-get -qq update && sudo apt-get install -y devscripts shellcheck && make test
-      - name: Install buildx
-        id: buildx
-        uses: crazy-max/ghaction-docker-buildx@v1
-        with:
-          version: latest
+      # https://github.com/docker/setup-qemu-action
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      # https://github.com/docker/setup-buildx-action
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
       - name: Get latest release version number
         id: docker-tag
         uses: yuya-takeyama/docker-tag-from-github-ref-action@v1

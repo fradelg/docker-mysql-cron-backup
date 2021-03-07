@@ -9,7 +9,8 @@ fi
 
 echo "=> Restore database from $1"
 set -o pipefail
-if gunzip --stdout "$1" | mysql -h "$MYSQL_HOST" -P "$MYSQL_PORT" -u "$MYSQL_USER" -p"$MYSQL_PASS"
+DB_NAME=${MYSQL_DATABASE:-${MYSQL_DB}}
+if gunzip --stdout "$1" | mysql -h "$MYSQL_HOST" -P "$MYSQL_PORT" -u "$MYSQL_USER" -p"$MYSQL_PASS" "$DB_NAME"
 then
     echo "=> Restore succeeded"
 else

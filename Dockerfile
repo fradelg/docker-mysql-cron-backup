@@ -13,7 +13,15 @@ RUN go install
 FROM alpine:3.12
 LABEL maintainer "Fco. Javier Delgado del Hoyo <frandelhoyo@gmail.com>"
 
-RUN apk add --update tzdata bash mysql-client gzip openssl mariadb-connector-c && rm -rf /var/cache/apk/*
+RUN apk add --update \
+        tzdata \
+        bash \
+        mysql-client \
+        gzip \
+        openssl \
+        mariadb-connector-c \
+        busybox-suid && \
+    rm -rf /var/cache/apk/*
 
 COPY --from=binary /go/bin/dockerize /usr/local/bin
 
@@ -23,7 +31,12 @@ ENV CRON_TIME="0 3 * * sun" \
     TIMEOUT="10s"
 
 COPY ["run.sh", "backup.sh", "restore.sh", "/"]
-RUN mkdir /backup && chmod u+x /backup.sh /restore.sh
+RUN mkdir /backup && \ 
+    chmod 755 /run.sh /backup.sh /restore.sh && \
+    touch /mysql_backup.log && \
+    chmod 666 /mysql_backup.log && \
+    adduser -S -u 1000 -g 100 cronuser
+
 VOLUME ["/backup"]
 
 CMD dockerize -wait tcp://${MYSQL_HOST}:${MYSQL_PORT} -timeout ${TIMEOUT} /run.sh

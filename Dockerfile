@@ -3,7 +3,9 @@ RUN apk -U add openssl git
 
 ARG DOCKERIZE_VERSION=v0.6.1
 WORKDIR /go/src/github.com/jwilder
-RUN git clone https://github.com/jwilder/dockerize.git && cd dockerize && git checkout ${DOCKERIZE_VERSION}
+RUN git clone https://github.com/jwilder/dockerize.git && \
+    cd dockerize && \
+    git checkout ${DOCKERIZE_VERSION}
 
 WORKDIR /go/src/github.com/jwilder/dockerize
 RUN go get github.com/robfig/glock
@@ -31,11 +33,11 @@ ENV CRON_TIME="0 3 * * sun" \
     TIMEOUT="10s"
 
 COPY ["run.sh", "backup.sh", "restore.sh", "/"]
-RUN mkdir /backup && \ 
+RUN mkdir /backup && \
+    chmod 777 /backup && \ 
     chmod 755 /run.sh /backup.sh /restore.sh && \
     touch /mysql_backup.log && \
-    chmod 666 /mysql_backup.log && \
-    adduser -S -u 1000 -g 100 cronuser
+    chmod 666 /mysql_backup.log
 
 VOLUME ["/backup"]
 

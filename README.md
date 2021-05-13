@@ -74,13 +74,17 @@ volumes:
 
 ## Restore from a backup
 
+### List all available backups :
+
 See the list of backups in your running docker container, just write in your favorite terminal:
 
 ```bash
-docker container exec <your_mysql_backuo_container_name> ls /backup
+docker container exec <your_mysql_backup_container_name> ls /backup
 ```
 
-To restore a database from a certain backup you have to specify the database name in the variable MYSQL_DATABASE:
+### Restore using a compose file
+
+To restore a database from a certain backup you may have to specify the database name in the variable MYSQL_DATABASE:
 
 ```YAML
 mysql-cron-backup:
@@ -96,3 +100,10 @@ mysql-cron-backup:
       - MYSQL_PASS=${MARIADB_ROOT_PASSWORD}
       - MYSQL_DATABASE=${DATABASE_NAME}
 ```
+### Restore using a docker command
+
+```bash
+docker container exec <your_mysql_backup_container_name> /restore.sh backup/<your_sql_backup_gz_file>
+```
+
+if no database name is specified, `restore.sh` will try to find the database name from the backup file.

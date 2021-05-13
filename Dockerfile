@@ -3,7 +3,9 @@ RUN apk -U add openssl git
 
 ARG DOCKERIZE_VERSION=v0.6.1
 WORKDIR /go/src/github.com/jwilder
-RUN git clone https://github.com/jwilder/dockerize.git && cd dockerize && git checkout ${DOCKERIZE_VERSION}
+RUN git clone https://github.com/jwilder/dockerize.git && \
+    cd dockerize && \
+    git checkout ${DOCKERIZE_VERSION}
 
 WORKDIR /go/src/github.com/jwilder/dockerize
 RUN go get github.com/robfig/glock
@@ -13,7 +15,14 @@ RUN go install
 FROM alpine:3.12
 LABEL maintainer "Fco. Javier Delgado del Hoyo <frandelhoyo@gmail.com>"
 
-RUN apk add --update tzdata bash mysql-client gzip openssl mariadb-connector-c && rm -rf /var/cache/apk/*
+RUN apk add --update \
+        tzdata \
+        bash \
+        mysql-client \
+        gzip \
+        openssl \
+        mariadb-connector-c && \
+    rm -rf /var/cache/apk/*
 
 COPY --from=binary /go/bin/dockerize /usr/local/bin
 
@@ -23,7 +32,12 @@ ENV CRON_TIME="0 3 * * sun" \
     TIMEOUT="10s"
 
 COPY ["run.sh", "backup.sh", "restore.sh", "/"]
-RUN mkdir /backup && chmod u+x /backup.sh /restore.sh
+RUN mkdir /backup && \
+    chmod 777 /backup && \ 
+    chmod 755 /run.sh /backup.sh /restore.sh && \
+    touch /mysql_backup.log && \
+    chmod 666 /mysql_backup.log
+
 VOLUME ["/backup"]
 
 CMD dockerize -wait tcp://${MYSQL_HOST}:${MYSQL_PORT} -timeout ${TIMEOUT} /run.sh

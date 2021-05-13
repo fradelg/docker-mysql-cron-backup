@@ -1,8 +1,6 @@
-[![Build Status](https://travis-ci.org/fradelg/docker-mysql-cron-backup.svg?branch=master)](https://travis-ci.org/fradelg/docker-mysql-cron-backup)
-
 # mysql-cron-backup
 
-This docker image runs mysqldump to backup your databases periodically using cron task manager. Backups are placed in `/backup` so you can mount your backup docker volume in this path.
+Run mysqldump to backup your databases periodically using the cron task manager in the container. Your backups are saved in `/backup`. You can mount any directory of your host or a docker volumes in /backup. Othwerwise, a docker volume is created in the default location.
 
 ## Usage:
 
@@ -103,7 +101,7 @@ mysql-cron-backup:
 ### Restore using a docker command
 
 ```bash
-docker container exec <your_mysql_backup_container_name> /restore.sh backup/<your_sql_backup_gz_file>
+docker container exec <your_mysql_backup_container_name> /restore.sh /backup/<your_sql_backup_gz_file>
 ```
 
 if no database name is specified, `restore.sh` will try to find the database name from the backup file.

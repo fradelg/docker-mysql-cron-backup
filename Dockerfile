@@ -21,8 +21,7 @@ RUN apk add --update \
         mysql-client \
         gzip \
         openssl \
-        mariadb-connector-c \
-        busybox-suid && \
+        mariadb-connector-c && \
     rm -rf /var/cache/apk/*
 
 COPY --from=binary /go/bin/dockerize /usr/local/bin

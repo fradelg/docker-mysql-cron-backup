@@ -11,7 +11,7 @@ set -o pipefail
 
 SQL=$(gunzip -c "$1")
 DB_NAME=${MYSQL_DATABASE:-${MYSQL_DB}}
-if [ -z "${DB_NAME}"]
+if [ -z "${DB_NAME}" ]
 then
     DB_NAME=$(echo "$SQL" | grep -oE '(Database: (.+))' | cut -d ' ' -f 2)
 fi

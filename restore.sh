@@ -1,5 +1,9 @@
 #!/bin/bash
+
 [ -z "${MYSQL_USER}" ] && { echo "=> MYSQL_USER cannot be empty" && exit 1; }
+# If provided, take password from file
+[ -z "${MYSQL_PASS_FILE}" ] || { MYSQL_PASS=$(head -1 "${MYSQL_PASS_FILE}"); }
+# Alternatively, take it from env var
 [ -z "${MYSQL_PASS}" ] && { echo "=> MYSQL_PASS cannot be empty" && exit 1; }
 
 if [ "$#" -ne 1 ]

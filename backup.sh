@@ -12,7 +12,11 @@ echo "=> Backup started at $(date "+%Y-%m-%d %H:%M:%S")"
 DATABASES=${MYSQL_DATABASE:-${MYSQL_DB:-$(mysql -h "$MYSQL_HOST" -P "$MYSQL_PORT" -u "$MYSQL_USER" -p"$MYSQL_PASS" -e "SHOW DATABASES;" | tr -d "| " | grep -v Database)}}
 for db in ${DATABASES}
 do
-  if [[ "$db" != "information_schema" ]] && [[ "$db" != "performance_schema" ]] && [[ "$db" != "mysql" ]] && [[ "$db" != _* ]]
+  if  [[ "$db" != "information_schema" ]] \
+      && [[ "$db" != "performance_schema" ]] \
+      && [[ "$db" != "mysql" ]] \
+      && [[ "$db" != "sys" ]] \
+      && [[ "$db" != _* ]]
   then
     echo "==> Dumping database: $db"
     FILENAME=/backup/$DATE.$db.sql

@@ -19,6 +19,7 @@ docker container run -d \
 - `MYSQL_PORT`: The port number of your mysql database.
 - `MYSQL_USER`: The username of your mysql database.
 - `MYSQL_PASS`: The password of your mysql database.
+- `MYSQL_PASS_FILE`: The file in container where to find the password of your mysql database (cf. docker secrets). You should use either MYSQL_PASS_FILE or MYSQL_PASS (see examples below).
 - `MYSQL_DATABASE`: The database name to dump. Default: `--all-databases`.
 - `MYSQLDUMP_OPTS`: Command line arguments to pass to mysqldump. Example: `--single-transaction`.
 - `CRON_TIME`: The interval of cron job to run mysqldump. `0 3 * * sun` by default, which is every Sunday at 03:00. It uses UTC timezone.
@@ -30,6 +31,8 @@ docker container run -d \
 - `TZ`: Specify TIMEZONE in Container. E.g. "Europe/Berlin". Default is UTC.
 
 If you want to make this image the perfect companion of your MySQL container, use [docker-compose](https://docs.docker.com/compose/). You can add more services that will be able to connect to the MySQL image using the name `my_mariadb`, note that you only expose the port `3306` internally to the servers and not to the host:
+
+### Docker-compose with MYSQL_PASS env var:
 
 ```yaml
 version: "2"
@@ -68,6 +71,61 @@ services:
 
 volumes:
   data:
+```
+
+### Docker-compose using docker secrets:
+
+The database root password passed to docker container by using [docker secrets](https://docs.docker.com/engine/swarm/).
+
+In example below, docker is in classic 'docker engine mode' (iow. not swarm mode) and secret source is a local file on host filesystem.
+
+Alternatively, secret can be stored in docker secrets engine (iow. not in host filesystem).
+
+```yaml
+version: "3.7"
+
+secrets:
+  mysql_root_password:
+    # Place your secret file somewhere on your host filesystem, with your password inside
+    file: ./secrets/mysql_root_password
+
+services:
+  mariadb:
+    image: mariadb:10
+    container_name: my_mariadb
+    expose:
+      - 3306
+    volumes:
+      - data:/var/lib/mysql
+      - ${VOLUME_PATH}/backup:/backup
+    environment:
+      - MYSQL_DATABASE=${DATABASE_NAME}
+      - MYSQL_ROOT_PASSWORD_FILE=/run/secrets/mysql_root_password
+    secrets:
+      - mysql_root_password
+    restart: unless-stopped
+
+  backup:
+    build: .
+    image: fradelg/mysql-cron-backup
+    depends_on:
+      - mariadb
+    volumes:
+      - ${VOLUME_PATH}/backup:/backup
+    environment:
+      - MYSQL_HOST=my_mariadb
+      - MYSQL_USER=root
+      - MYSQL_PASS_FILE=/run/secrets/mysql_root_password
+      - MAX_BACKUPS=10
+      - INIT_BACKUP=1
+      - CRON_TIME=0 0 * * *
+    secrets:
+      - mysql_root_password
+    restart: unless-stopped
+
+volumes:
+  data:
+
 ```
 
 ## Restore from a backup

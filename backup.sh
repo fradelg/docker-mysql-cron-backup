@@ -1,5 +1,9 @@
 #!/bin/bash
+
 [ -z "${MYSQL_USER}" ] && { echo "=> MYSQL_USER cannot be empty" && exit 1; }
+# If provided, take password from file
+[ -z "${MYSQL_PASS_FILE}" ] || { MYSQL_PASS=$(head -1 "${MYSQL_PASS_FILE}"); }
+# Alternatively, take it from env var
 [ -z "${MYSQL_PASS:=$MYSQL_PASSWORD}" ] && { echo "=> MYSQL_PASS cannot be empty" && exit 1; }
 [ -z "${GZIP_LEVEL}" ] && { GZIP_LEVEL=6; }
 
@@ -8,7 +12,11 @@ echo "=> Backup started at $(date "+%Y-%m-%d %H:%M:%S")"
 DATABASES=${MYSQL_DATABASE:-${MYSQL_DB:-$(mysql -h "$MYSQL_HOST" -P "$MYSQL_PORT" -u "$MYSQL_USER" -p"$MYSQL_PASS" -e "SHOW DATABASES;" | tr -d "| " | grep -v Database)}}
 for db in ${DATABASES}
 do
-  if [[ "$db" != "information_schema" ]] && [[ "$db" != "performance_schema" ]] && [[ "$db" != "mysql" ]] && [[ "$db" != _* ]]
+  if  [[ "$db" != "information_schema" ]] \
+      && [[ "$db" != "performance_schema" ]] \
+      && [[ "$db" != "mysql" ]] \
+      && [[ "$db" != "sys" ]] \
+      && [[ "$db" != _* ]]
   then
     echo "==> Dumping database: $db"
     FILENAME=/backup/$DATE.$db.sql

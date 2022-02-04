@@ -13,13 +13,20 @@ fi
 
 set -o pipefail
 
-SQL=$(gunzip -c "$1")
+if [ -z "${USE_PLAIN_SQL}" ]
+then 
+    SQL=$(gunzip -c "$1")
+else
+    SQL=$(cat "$1")
+fi
+
 DB_NAME=${MYSQL_DATABASE:-${MYSQL_DB}}
 if [ -z "${DB_NAME}" ]
 then
+    echo "=> Searching database name in $1"
     DB_NAME=$(echo "$SQL" | grep -oE '(Database: (.+))' | cut -d ' ' -f 2)
 fi
-[ -z "${DB_NAME}" ] && { echo "=> database name cannot be found" && exit 1; }
+[ -z "${DB_NAME}" ] && { echo "=> Database name not found" && exit 1; }
 
 echo "=> Restore database $DB_NAME from $1"
 

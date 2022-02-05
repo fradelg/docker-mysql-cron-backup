@@ -29,7 +29,8 @@ COPY --from=binary /go/bin/dockerize /usr/local/bin
 ENV CRON_TIME="0 3 * * sun" \
     MYSQL_HOST="mysql" \
     MYSQL_PORT="3306" \
-    TIMEOUT="10s"
+    TIMEOUT="10s" \
+    MYSQLDUMP_OPTS="--quick"
 
 COPY ["run.sh", "backup.sh", "restore.sh", "/"]
 RUN mkdir /backup && \

@@ -20,19 +20,28 @@ do
   then
     echo "==> Dumping database: $db"
     FILENAME=/backup/$DATE.$db.sql
-    LATEST=/backup/latest.$db.sql.gz
-    if mysqldump --single-transaction -h "$MYSQL_HOST" -P "$MYSQL_PORT" -u "$MYSQL_USER" -p"$MYSQL_PASS" "$db" $MYSQLDUMP_OPTS > "$FILENAME"
+    LATEST=/backup/latest.$db.sql
+    if mysqldump --single-transaction "$MYSQLDUMP_OPTS" -h "$MYSQL_HOST" -P "$MYSQL_PORT" -u "$MYSQL_USER" -p"$MYSQL_PASS" "$db" > "$FILENAME"
     then
-      gzip "-$GZIP_LEVEL" -f "$FILENAME"
-      echo "==> Creating symlink to latest backup: $(basename "$FILENAME".gz)"
+      EXT=
+      if [ -z "${USE_PLAIN_SQL}" ]
+      then
+        echo "==> Compressing $db with LEVEL $GZIP_LEVEL"
+        gzip "-$GZIP_LEVEL" -f "$FILENAME"
+        EXT=.gz
+        FILENAME=$FILENAME$EXT
+        LATEST=$LATEST$EXT
+      fi
+      BASENAME=$(basename "$FILENAME")
+      echo "==> Creating symlink to latest backup: $BASENAME"
       rm "$LATEST" 2> /dev/null
-      cd /backup || exit && ln -s "$(basename "$FILENAME".gz)" "$(basename "$LATEST")"
+      cd /backup || exit && ln -s "$BASENAME" "$(basename "$LATEST")"
       if [ -n "$MAX_BACKUPS" ]
       then
-        while [ "$(find /backup -maxdepth 1 -name "*.$db.sql.gz" -type f | wc -l)" -gt "$MAX_BACKUPS" ]
+        while [ "$(find /backup -maxdepth 1 -name "*.$db.sql$EXT" -type f | wc -l)" -gt "$MAX_BACKUPS" ]
         do
-          TARGET=$(find /backup -maxdepth 1 -name "*.$db.sql.gz" -type f | sort | head -n 1)
-          echo "==> Max number of backups ($MAX_BACKUPS) reached. Deleting ${TARGET} ..."
+          TARGET=$(find /backup -maxdepth 1 -name "*.$db.sql$EXT" -type f | sort | head -n 1)
+          echo "==> Max number of ($MAX_BACKUPS) backups reached. Deleting ${TARGET} ..."
           rm -rf "${TARGET}"
           echo "==> Backup ${TARGET} deleted"
         done

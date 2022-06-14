@@ -30,7 +30,7 @@ fi
 
 echo "=> Restore database $DB_NAME from $1"
 
-if echo "$SQL" | mysql -h "$MYSQL_HOST" -P "$MYSQL_PORT" -u "$MYSQL_USER" -p"$MYSQL_PASS" "$DB_NAME"
+if echo "$SQL" | mysql -h "$MYSQL_HOST" -P "$MYSQL_PORT" -u "$MYSQL_USER" -p"$MYSQL_PASS" "$DB_NAME" $MYSQL_SSL_OPTS
 then
     echo "=> Restore succeeded"
 else

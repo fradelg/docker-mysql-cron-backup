@@ -12,7 +12,7 @@ RUN go get github.com/robfig/glock
 RUN glock sync -n < GLOCKFILE
 RUN go install
 
-FROM alpine:3.16.1
+FROM alpine:3.16.2
 LABEL maintainer "Fco. Javier Delgado del Hoyo <frandelhoyo@gmail.com>"
 
 RUN apk add --update \

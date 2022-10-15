@@ -18,9 +18,11 @@ docker container run -d \
 - `MYSQL_HOST`: The host/ip of your mysql database.
 - `MYSQL_PORT`: The port number of your mysql database.
 - `MYSQL_USER`: The username of your mysql database.
+- `MYSQL_USER_FILE`: The file in container where to find the user of your mysql database (cf. docker secrets). You should use either MYSQL_USER_FILE or MYSQL_USER (see examples below).
 - `MYSQL_PASS`: The password of your mysql database.
 - `MYSQL_PASS_FILE`: The file in container where to find the password of your mysql database (cf. docker secrets). You should use either MYSQL_PASS_FILE or MYSQL_PASS (see examples below).
 - `MYSQL_DATABASE`: The database name to dump. Default: `--all-databases`.
+- `MYSQL_DATABASE_FILE`: The file in container where to find the database name in your mysql database (cf. docker secrets). You should use either MYSQL_DATABASE or MYSQL_DATABASE_FILE (see examples below).
 - `MYSQLDUMP_OPTS`: Command line arguments to pass to mysqldump (see [mysqldump documentation](https://dev.mysql.com/doc/refman/8.0/en/mysqldump.html)).
 - `MYSQL_SSL_OPTS`: Command line arguments to use [SSL](https://dev.mysql.com/doc/refman/5.6/en/using-encrypted-connections.html).
 - `CRON_TIME`: The interval of cron job to run mysqldump. `0 3 * * sun` by default, which is every Sunday at 03:00. It uses UTC timezone.
@@ -79,17 +81,23 @@ volumes:
 
 The database root password passed to docker container by using [docker secrets](https://docs.docker.com/engine/swarm/).
 
-In example below, docker is in classic 'docker engine mode' (iow. not swarm mode) and secret source is a local file on host filesystem.
+In example below, docker is in classic 'docker engine mode' (iow. not swarm mode) and secret sources are local files on host filesystem.
 
-Alternatively, secret can be stored in docker secrets engine (iow. not in host filesystem).
+Alternatively, secrets can be stored in docker secrets engine (iow. not in host filesystem).
 
 ```yaml
 version: "3.7"
 
 secrets:
+  # Place your secret file somewhere on your host filesystem, with your password inside
   mysql_root_password:
-    # Place your secret file somewhere on your host filesystem, with your password inside
     file: ./secrets/mysql_root_password
+  mysql_user:
+    file: ./secrets/mysql_user
+  mysql_password:
+    file: ./secrets/mysql_password
+  mysql_database:
+    file: ./secrets/mysql_database
 
 services:
   mariadb:
@@ -101,10 +109,15 @@ services:
       - data:/var/lib/mysql
       - ${VOLUME_PATH}/backup:/backup
     environment:
-      - MYSQL_DATABASE=${DATABASE_NAME}
       - MYSQL_ROOT_PASSWORD_FILE=/run/secrets/mysql_root_password
+      - MYSQL_USER_FILE=/run/secrets/mysql_user
+      - MYSQL_PASSWORD_FILE=/run/secrets/mysql_password
+      - MYSQL_DATABASE_FILE=/run/secrets/mysql_database
     secrets:
       - mysql_root_password
+      - mysql_user
+      - mysql_password
+      - mysql_database
     restart: unless-stopped
 
   backup:
@@ -116,13 +129,18 @@ services:
       - ${VOLUME_PATH}/backup:/backup
     environment:
       - MYSQL_HOST=my_mariadb
-      - MYSQL_USER=root
-      - MYSQL_PASS_FILE=/run/secrets/mysql_root_password
+      # Alternatively to MYSQL_USER_FILE, we can use MYSQL_USER=root to use root user instead
+      - MYSQL_USER_FILE=/run/secrets/mysql_user
+      # Alternatively, we can use /run/secrets/mysql_root_password when using root user
+      - MYSQL_PASS_FILE=/run/secrets/mysql_password
+      - MYSQL_DATABASE_FILE=/run/secrets/mysql_database
       - MAX_BACKUPS=10
       - INIT_BACKUP=1
       - CRON_TIME=0 0 * * *
     secrets:
-      - mysql_root_password
+      - mysql_user
+      - mysql_password
+      - mysql_database
     restart: unless-stopped
 
 volumes:

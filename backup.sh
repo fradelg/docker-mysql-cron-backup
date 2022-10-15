@@ -1,10 +1,18 @@
 #!/bin/bash
 
+# Get hostname: try read from file, else get from env
+[ -z "${MYSQL_HOST_FILE}" ] || { MYSQL_USER=$(head -1 "${MYSQL_HOST_FILE}"); }
+[ -z "${MYSQL_HOST}" ] && { echo "=> MYSQL_HOST cannot be empty" && exit 1; }
+# Get username: try read from file, else get from env
+[ -z "${MYSQL_USER_FILE}" ] || { MYSQL_USER=$(head -1 "${MYSQL_USER_FILE}"); }
 [ -z "${MYSQL_USER}" ] && { echo "=> MYSQL_USER cannot be empty" && exit 1; }
-# If provided, take password from file
+# Get password: try read from file, else get from env, else get from MYSQL_PASSWORD env
 [ -z "${MYSQL_PASS_FILE}" ] || { MYSQL_PASS=$(head -1 "${MYSQL_PASS_FILE}"); }
-# Alternatively, take it from env var
 [ -z "${MYSQL_PASS:=$MYSQL_PASSWORD}" ] && { echo "=> MYSQL_PASS cannot be empty" && exit 1; }
+# Get database name(s): try read from file, else get from env
+# Note: when from file, there can be one database name per line in that file
+[ -z "${MYSQL_DATABASE_FILE}" ] || { MYSQL_DATABASE=$(cat "${MYSQL_DATABASE_FILE}"); }
+# Get level from env, else use 6
 [ -z "${GZIP_LEVEL}" ] && { GZIP_LEVEL=6; }
 
 DATE=$(date +%Y%m%d%H%M)

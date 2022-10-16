@@ -15,14 +15,16 @@ docker container run -d \
 
 ## Variables
 
+
 - `MYSQL_HOST`: The host/ip of your mysql database.
+- `MYSQL_HOST_FILE`: The file in container where to find the host of your mysql database (cf. docker secrets). You should use either MYSQL_HOST_FILE or MYSQL_HOST (see examples below).
 - `MYSQL_PORT`: The port number of your mysql database.
 - `MYSQL_USER`: The username of your mysql database.
 - `MYSQL_USER_FILE`: The file in container where to find the user of your mysql database (cf. docker secrets). You should use either MYSQL_USER_FILE or MYSQL_USER (see examples below).
 - `MYSQL_PASS`: The password of your mysql database.
 - `MYSQL_PASS_FILE`: The file in container where to find the password of your mysql database (cf. docker secrets). You should use either MYSQL_PASS_FILE or MYSQL_PASS (see examples below).
 - `MYSQL_DATABASE`: The database name to dump. Default: `--all-databases`.
-- `MYSQL_DATABASE_FILE`: The file in container where to find the database name in your mysql database (cf. docker secrets). You should use either MYSQL_DATABASE or MYSQL_DATABASE_FILE (see examples below).
+- `MYSQL_DATABASE_FILE`: The file in container where to find the database name(s) in your mysql database (cf. docker secrets). In that file, there can be several database names: one per line. You should use either MYSQL_DATABASE or MYSQL_DATABASE_FILE (see examples below).
 - `MYSQLDUMP_OPTS`: Command line arguments to pass to mysqldump (see [mysqldump documentation](https://dev.mysql.com/doc/refman/8.0/en/mysqldump.html)).
 - `MYSQL_SSL_OPTS`: Command line arguments to use [SSL](https://dev.mysql.com/doc/refman/5.6/en/using-encrypted-connections.html).
 - `CRON_TIME`: The interval of cron job to run mysqldump. `0 3 * * sun` by default, which is every Sunday at 03:00. It uses UTC timezone.

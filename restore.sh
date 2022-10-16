@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Get hostname: try read from file, else get from env
-[ -z "${MYSQL_HOST_FILE}" ] || { MYSQL_USER=$(head -1 "${MYSQL_HOST_FILE}"); }
+[ -z "${MYSQL_HOST_FILE}" ] || { MYSQL_HOST=$(head -1 "${MYSQL_HOST_FILE}"); }
 [ -z "${MYSQL_HOST}" ] && { echo "=> MYSQL_HOST cannot be empty" && exit 1; }
 # Get username: try read from file, else get from env
 [ -z "${MYSQL_USER_FILE}" ] || { MYSQL_USER=$(head -1 "${MYSQL_USER_FILE}"); }

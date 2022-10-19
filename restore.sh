@@ -1,10 +1,14 @@
 #!/bin/bash
 
+# Get hostname: try read from file, else get from env
+[ -z "${MYSQL_HOST_FILE}" ] || { MYSQL_HOST=$(head -1 "${MYSQL_HOST_FILE}"); }
+[ -z "${MYSQL_HOST}" ] && { echo "=> MYSQL_HOST cannot be empty" && exit 1; }
+# Get username: try read from file, else get from env
+[ -z "${MYSQL_USER_FILE}" ] || { MYSQL_USER=$(head -1 "${MYSQL_USER_FILE}"); }
 [ -z "${MYSQL_USER}" ] && { echo "=> MYSQL_USER cannot be empty" && exit 1; }
-# If provided, take password from file
+# Get password: try read from file, else get from env, else get from MYSQL_PASSWORD env
 [ -z "${MYSQL_PASS_FILE}" ] || { MYSQL_PASS=$(head -1 "${MYSQL_PASS_FILE}"); }
-# Alternatively, take it from env var
-[ -z "${MYSQL_PASS}" ] && { echo "=> MYSQL_PASS cannot be empty" && exit 1; }
+[ -z "${MYSQL_PASS:=$MYSQL_PASSWORD}" ] && { echo "=> MYSQL_PASS cannot be empty" && exit 1; }
 
 if [ "$#" -ne 1 ]
 then
@@ -14,7 +18,7 @@ fi
 set -o pipefail
 
 if [ -z "${USE_PLAIN_SQL}" ]
-then 
+then
     SQL=$(gunzip -c "$1")
 else
     SQL=$(cat "$1")

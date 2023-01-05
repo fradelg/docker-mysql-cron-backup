@@ -11,7 +11,8 @@ elif [ -n "${INIT_RESTORE_LATEST}" ]; then
       echo "waiting database container..."
       sleep 1
   done
-  find /backup -maxdepth 1 -name '*.sql.gz' | tail -1 | xargs /restore.sh
+  # The [^l] is needed to exclude the latest backup file, and sort only data-tagged backups
+  find /backup -maxdepth 1 -name '[^l]*.sql.gz' | sort | tail -1 | xargs /restore.sh
 fi
 
 echo "${CRON_TIME} /backup.sh >> /mysql_backup.log 2>&1" > /tmp/crontab.conf

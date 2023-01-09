@@ -46,13 +46,8 @@ do
       cd /backup || exit && ln -s "$BASENAME" "$(basename "$LATEST")"
       if [ -n "$MAX_BACKUPS" ]
       then
-        while [ "$(find /backup -maxdepth 1 -name "*.$db.sql$EXT" -type f | wc -l)" -gt "$MAX_BACKUPS" ]
-        do
-          TARGET=$(find /backup -maxdepth 1 -name "*.$db.sql$EXT" -type f | sort | head -n 1)
-          echo "==> Max number of ($MAX_BACKUPS) backups reached. Deleting ${TARGET} ..."
-          rm -rf "${TARGET}"
-          echo "==> Backup ${TARGET} deleted"
-        done
+        # Execute the delete script, delete older backup or other custom delete script
+        /delete.sh $db $EXT
       fi
     else
       rm -rf "$FILENAME"

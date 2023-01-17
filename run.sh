@@ -34,6 +34,6 @@ crond -f -l 8 -L /mysql_backup.log &
 
 echo "Listening on crond, and wait..."
 
-while : ; do sleep 1 ; done
+tail -f /dev/null & wait $!
 
 echo "Script is shutted down."

@@ -16,7 +16,7 @@ elif [ -n "${INIT_RESTORE_LATEST}" ]; then
   find /backup -maxdepth 1 -name '[0-9]*.*.sql.gz' | sort | tail -1 | xargs /restore.sh
 fi
 
-function final_backup {
+function final_backup () {
     echo "=> Captured trap for final backup"
     DATE=$(date +%Y%m%d%H%M)
     echo "=> Requested last backup at $(date "+%Y-%m-%d %H:%M:%S")"

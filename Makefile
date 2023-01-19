@@ -6,7 +6,7 @@ test:
 	# Checking for syntax errors
 	set -e; for SCRIPT in *.sh; \
 	do \
-		sh -n $$SCRIPT; \
+		bash -n $$SCRIPT; \
 	done
 
 	# Checking for bashisms (currently not failing, but only listing)

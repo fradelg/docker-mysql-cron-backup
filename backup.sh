@@ -47,7 +47,7 @@ do
       if [ -n "$MAX_BACKUPS" ]
       then
         # Execute the delete script, delete older backup or other custom delete script
-        /delete.sh $db $EXT
+        /delete.sh "$db" $EXT
       fi
     else
       rm -rf "$FILENAME"

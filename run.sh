@@ -14,7 +14,7 @@ elif [ -n "${INIT_RESTORE_LATEST}" ]; then
   find /backup -maxdepth 1 -name '*.sql.gz' | tail -1 | xargs /restore.sh
 fi
 
-touch /.status
+touch /HEALTHY.status
 
 echo "${CRON_TIME} /backup.sh >> /mysql_backup.log 2>&1" > /tmp/crontab.conf
 crontab /tmp/crontab.conf

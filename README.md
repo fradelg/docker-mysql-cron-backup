@@ -13,6 +13,12 @@ docker container run -d \
        fradelg/mysql-cron-backup
 ```
 
+### Healthcheck
+
+
+Healthcheck is provided as a basic init control.
+Container is **Healthy** after the database init phase, that is after `INIT_BACKUP` or `INIT_RESTORE_LATEST` happends without check if there is an error, **Starting** otherwise. Not other checks are actually provided.
+
 ## Variables
 
 

@@ -28,6 +28,8 @@ if [ -n "${EXIT_BACKUP}" ]; then
   trap final_backup SIGHUP SIGINT SIGTERM
 fi
 
+touch /HEALTHY.status
+
 echo "${CRON_TIME} /backup.sh >> /mysql_backup.log 2>&1" > /tmp/crontab.conf
 crontab /tmp/crontab.conf
 echo "=> Running cron task manager in foreground"

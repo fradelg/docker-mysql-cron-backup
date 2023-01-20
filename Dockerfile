@@ -42,6 +42,6 @@ RUN mkdir /backup && \
 VOLUME ["/backup"]
 
 HEALTHCHECK --interval=2s --retries=1800 \
-	CMD stat /HEALTLY.status || exit 1
+	CMD stat /HEALTHY.status || exit 1
 
 ENTRYPOINT dockerize -wait tcp://${MYSQL_HOST}:${MYSQL_PORT} -timeout ${TIMEOUT} /run.sh

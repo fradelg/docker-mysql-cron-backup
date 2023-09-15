@@ -1,16 +1,16 @@
-FROM golang:1.15.8-alpine3.12 AS binary
+FROM golang:1.20.4 AS binary
 RUN apk -U add openssl git
 
-ARG DOCKERIZE_VERSION=v0.6.1
+ARG DOCKERIZE_VERSION=v0.7.0
 WORKDIR /go/src/github.com/jwilder
 RUN git clone https://github.com/jwilder/dockerize.git && \
     cd dockerize && \
     git checkout ${DOCKERIZE_VERSION}
 
 WORKDIR /go/src/github.com/jwilder/dockerize
-RUN go get github.com/robfig/glock
-RUN glock sync -n < GLOCKFILE
-RUN go install
+ENV GO111MODULE=on
+RUN go mod tidy
+RUN CGO_ENABLED=0 GOOS=linux GO111MODULE=on go build -a -o /go/bin/dockerize .
 
 FROM alpine:3.18.3
 LABEL maintainer "Fco. Javier Delgado del Hoyo <frandelhoyo@gmail.com>"

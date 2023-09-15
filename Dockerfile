@@ -1,4 +1,4 @@
-FROM golang:1.20.4 AS binary
+FROM golang:1.20.4-alpine3.18 AS binary
 RUN apk -U add openssl git
 
 ARG DOCKERIZE_VERSION=v0.7.0

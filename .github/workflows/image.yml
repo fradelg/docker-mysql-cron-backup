@@ -18,7 +18,7 @@ jobs:
         run: sudo apt-get -qq update && sudo apt-get install -y devscripts shellcheck && make test
       - name: Test image
         env:
-          VOLUME_PATH: ./ 
+          VOLUME_PATH: /tmp/mariadb 
           DATABASE_NAME: foo
           MARIADB_ROOT_PASSWORD: abcd 
         run: docker compose up --build

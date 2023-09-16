@@ -16,6 +16,7 @@ services:
   backup:
     build: .
     image: fradelg/mysql-cron-backup
+    command: /backup.sh
     depends_on:
       - mariadb
     volumes:

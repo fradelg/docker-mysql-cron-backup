@@ -21,7 +21,11 @@ jobs:
           VOLUME_PATH: /tmp/mariadb 
           DATABASE_NAME: foo
           MARIADB_ROOT_PASSWORD: abcd 
-        run: docker compose up --build
+        run: |
+          docker-compose up -d mariadb
+          docker-compose run backup /backup.sh
+          docker-compose run backup /restore.sh /backup/latest.foo.sql.gz
+          docker-compose stop
   build:
     runs-on: ubuntu-22.04
     needs: test

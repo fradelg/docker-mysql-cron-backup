@@ -13,6 +13,7 @@
 if [ "$#" -ne 1 ]
 then
     echo "You must pass the path of the backup file to restore"
+    exit 1
 fi
 
 set -o pipefail

@@ -16,6 +16,16 @@ jobs:
         uses: actions/checkout@v4
       - name: Test Bash scripts
         run: sudo apt-get -qq update && sudo apt-get install -y devscripts shellcheck && make test
+      - name: Test image
+        env:
+          VOLUME_PATH: /tmp/mariadb 
+          DATABASE_NAME: foo
+          MARIADB_ROOT_PASSWORD: abcd 
+        run: |
+          docker-compose up -d mariadb
+          docker-compose run backup /backup.sh
+          docker-compose run backup /restore.sh /backup/latest.foo.sql.gz
+          docker-compose stop
   build:
     runs-on: ubuntu-22.04
     needs: test

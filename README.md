@@ -80,6 +80,8 @@ services:
       - CRON_TIME=0 3 * * *
       # Make it small
       - GZIP_LEVEL=9
+      # As of MySQL 8.0.21 this is needed
+      - MYSQLDUMP_OPTS=--no-tablespaces
     restart: unless-stopped
 
 volumes:

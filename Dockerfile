@@ -12,7 +12,7 @@ ENV GO111MODULE=on
 RUN go mod tidy
 RUN CGO_ENABLED=0 GOOS=linux GO111MODULE=on go build -a -o /go/bin/dockerize .
 
-FROM alpine:3.20.1
+FROM alpine:3.20.2
 LABEL maintainer "Fco. Javier Delgado del Hoyo <frandelhoyo@gmail.com>"
 
 RUN apk add --update \

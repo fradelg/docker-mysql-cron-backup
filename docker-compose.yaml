@@ -2,7 +2,6 @@ version: "2"
 services:
   mariadb:
     image: mariadb:10
-    container_name: my_mariadb
     expose:
       - 3306
     volumes:
@@ -21,7 +20,7 @@ services:
     volumes:
       - ${VOLUME_PATH}/backup:/backup
     environment:
-      - MYSQL_HOST=my_mariadb
+      - MYSQL_HOST=mariadb
       - MYSQL_USER=root
       - MYSQL_PASS=${MARIADB_ROOT_PASSWORD}
       - MAX_BACKUPS=1

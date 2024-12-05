@@ -44,6 +44,11 @@ do
       echo "==> Creating symlink to latest backup: $BASENAME"
       rm "$LATEST" 2> /dev/null
       cd /backup || exit && ln -s "$BASENAME" "$(basename "$LATEST")"
+      if [ -n "$REMOVE_DUPLICATES" ]
+      then
+        echo "=> Removing duplicate database dumps"
+        fdupes -idN /backup/
+      fi
       if [ -n "$MAX_BACKUPS" ]
       then
         # Execute the delete script, delete older backup or other custom delete script

@@ -13,7 +13,7 @@
 # Note: when from file, there can be one database name per line in that file
 [ -z "${MYSQL_DATABASE_FILE}" ] || { MYSQL_DATABASE=$(cat "${MYSQL_DATABASE_FILE}"); }
 # Get level from env, else use 6
-[ -z "${GZIP_LEVEL}" ] && { GZIP_LEVEL=6; }
+[ -z "${BZIP2_LEVEL}" ] && { BZIP2_LEVEL=6; }
 
 DATE=$(date +%Y%m%d%H%M)
 echo "=> Backup started at $(date "+%Y-%m-%d %H:%M:%S")"
@@ -34,9 +34,9 @@ do
       EXT=
       if [ -z "${USE_PLAIN_SQL}" ]
       then
-        echo "==> Compressing $db with LEVEL $GZIP_LEVEL"
-        gzip "-$GZIP_LEVEL" -f "$FILENAME"
-        EXT=.gz
+        echo "==> Compressing $db with LEVEL $BZIP2_LEVEL"
+        bzip2 "-$BZIP2_LEVEL" -f "$FILENAME"
+        EXT=.bz2
         FILENAME=$FILENAME$EXT
         LATEST=$LATEST$EXT
       fi

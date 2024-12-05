@@ -19,7 +19,7 @@ RUN apk add --update \
         tzdata \
         bash \
         mysql-client \
-        gzip \
+        bzip2 \
         openssl \
         mariadb-connector-c && \
     rm -rf /var/cache/apk/*

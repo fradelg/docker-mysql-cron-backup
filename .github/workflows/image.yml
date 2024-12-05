@@ -24,7 +24,7 @@ jobs:
         run: |
           docker compose up -d mariadb
           docker compose run backup /backup.sh
-          docker compose run backup /restore.sh /backup/latest.foo.sql.gz
+          docker compose run backup /restore.sh /backup/latest.foo.sql.bz2
           docker compose stop
   build:
     runs-on: ubuntu-22.04

@@ -39,8 +39,8 @@ Container is **Healthy** after the database init phase, that is after `INIT_BACK
 - `INIT_RESTORE_LATEST`: If set, restores latest backup.
 - `EXIT_BACKUP`: If set, create a backup when the container stops.
 - `TIMEOUT`: Wait a given number of seconds for the database to be ready and make the first backup, `10s` by default. After that time, the initial attempt for backup gives up and only the Cron job will try to make a backup.
-- `BZIP2_LEVEL`: Specify the level of bzip2 compression from 1 (quickest, least compressed) to 9 (slowest, most compressed), default is 6.
-- `USE_PLAIN_SQL`: If set, back up and restore plain SQL files without bzip2.
+- `GZIP_LEVEL`: Specify the level of gzip compression from 1 (quickest, least compressed) to 9 (slowest, most compressed), default is 6.
+- `USE_PLAIN_SQL`: If set, back up and restore plain SQL files without gzip.
 - `TZ`: Specify TIMEZONE in Container. E.g. "Europe/Berlin". Default is UTC.
 - `REMOVE_DUPLICATES`: Use [fdupes](https://github.com/adrianlopezroche/fdupes) to remove duplicate database dumps
 
@@ -59,7 +59,7 @@ services:
     volumes:
       - data:/var/lib/mysql
       # If there is not scheme, restore the last created backup (if exists)
-      - ${VOLUME_PATH}/backup/latest.${DATABASE_NAME}.sql.bz2:/docker-entrypoint-initdb.d/database.sql.bz2
+      - ${VOLUME_PATH}/backup/latest.${DATABASE_NAME}.sql.gz:/docker-entrypoint-initdb.d/database.sql.gz
     environment:
       - MYSQL_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
       - MYSQL_DATABASE=${DATABASE_NAME}
@@ -80,7 +80,7 @@ services:
       # Every day at 03:00
       - CRON_TIME=0 3 * * *
       # Make it small
-      - BZIP2_LEVEL=9
+      - GZIP_LEVEL=9
       # As of MySQL 8.0.21 this is needed
       - MYSQLDUMP_OPTS=--no-tablespaces
     restart: unless-stopped
@@ -177,7 +177,7 @@ To restore a database from a certain backup you may have to specify the database
 ```YAML
 mysql-cron-backup:
     image: fradelg/mysql-cron-backup
-    command: "/restore.sh /backup/201708060500.${DATABASE_NAME}.sql.bz2"
+    command: "/restore.sh /backup/201708060500.${DATABASE_NAME}.sql.gz"
     depends_on:
       - mariadb
     volumes:
@@ -218,7 +218,7 @@ Set `EXIT_BACKUP` to automatic create a last backup on shutdown.
       # Every day at 03:00
       - CRON_TIME=0 3 * * *
       # Make it small
-      - BZIP2_LEVEL=9
+      - GZIP_LEVEL=9
     restart: unless-stopped
 
 volumes:
@@ -235,7 +235,7 @@ Docker database image could expose a directory you could add files as init sql s
     volumes:
       - data:/var/lib/mysql
       # If there is not scheme, restore using the init script (if exists)
-      - ./init-script.sql:/docker-entrypoint-initdb.d/database.sql.bz2
+      - ./init-script.sql:/docker-entrypoint-initdb.d/database.sql.gz
     environment:
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
       - MYSQL_DATABASE=${DATABASE_NAME}
@@ -250,7 +250,7 @@ Docker database image could expose a directory you could add files as init sql s
     volumes:
       - data:/var/lib/mysql
       # If there is not scheme, restore using the init script (if exists)
-      - ./init-script.sql:/docker-entrypoint-initdb.d/database.sql.bz2
+      - ./init-script.sql:/docker-entrypoint-initdb.d/database.sql.gz
     environment:
       - MYSQL_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
       - MYSQL_DATABASE=${DATABASE_NAME}

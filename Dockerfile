@@ -19,7 +19,7 @@ RUN apk add --update \
         tzdata \
         bash \
         mysql-client \
-        bzip2 \
+        gzip \
         openssl \
         mariadb-connector-c \
         fdupes && \

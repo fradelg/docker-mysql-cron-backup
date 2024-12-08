@@ -21,7 +21,8 @@ RUN apk add --update \
         mysql-client \
         gzip \
         openssl \
-        mariadb-connector-c && \
+        mariadb-connector-c \
+        fdupes && \
     rm -rf /var/cache/apk/*
 
 COPY --from=binary /go/bin/dockerize /usr/local/bin

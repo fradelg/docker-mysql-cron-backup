@@ -29,13 +29,13 @@ do
     echo "==> Dumping database: $db"
     FILENAME=/backup/$DATE.$db.sql
     LATEST=/backup/latest.$db.sql
-    if mysqldump --single-transaction $MYSQLDUMP_OPTS -h "$MYSQL_HOST" -P "$MYSQL_PORT" -u "$MYSQL_USER" -p"$MYSQL_PASS" $MYSQL_SSL_OPTS "$db" > "$FILENAME"
+    if mysqldump --single-transaction --skip-comments $MYSQLDUMP_OPTS -h "$MYSQL_HOST" -P "$MYSQL_PORT" -u "$MYSQL_USER" -p"$MYSQL_PASS" $MYSQL_SSL_OPTS "$db" > "$FILENAME"
     then
       EXT=
       if [ -z "${USE_PLAIN_SQL}" ]
       then
         echo "==> Compressing $db with LEVEL $GZIP_LEVEL"
-        gzip "-$GZIP_LEVEL" -f "$FILENAME"
+        gzip "-$GZIP_LEVEL" -n -f "$FILENAME"
         EXT=.gz
         FILENAME=$FILENAME$EXT
         LATEST=$LATEST$EXT
@@ -44,6 +44,11 @@ do
       echo "==> Creating symlink to latest backup: $BASENAME"
       rm "$LATEST" 2> /dev/null
       cd /backup || exit && ln -s "$BASENAME" "$(basename "$LATEST")"
+      if [ -n "$REMOVE_DUPLICATES" ]
+      then
+        echo "=> Removing duplicate database dumps"
+        fdupes -idN /backup/
+      fi
       if [ -n "$MAX_BACKUPS" ]
       then
         # Execute the delete script, delete older backup or other custom delete script

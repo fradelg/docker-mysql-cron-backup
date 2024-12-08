@@ -12,17 +12,17 @@ ENV GO111MODULE=on
 RUN go mod tidy
 RUN CGO_ENABLED=0 GOOS=linux GO111MODULE=on go build -a -o /go/bin/dockerize .
 
-FROM alpine:3.21.0
+FROM alpine:3.20.3
 LABEL maintainer "Fco. Javier Delgado del Hoyo <frandelhoyo@gmail.com>"
 
 RUN apk add --update \
-        tzdata \
-        bash \
-        mysql-client \
-        gzip \
-        openssl \
-        mariadb-connector-c \
-        fdupes && \
+    tzdata \
+    bash \
+    gzip \
+    openssl \
+    mysql-client=~10.11 \
+    mariadb-connector-c \
+    fdupes && \
     rm -rf /var/cache/apk/*
 
 COPY --from=binary /go/bin/dockerize /usr/local/bin
@@ -43,6 +43,6 @@ RUN mkdir /backup && \
 VOLUME ["/backup"]
 
 HEALTHCHECK --interval=2s --retries=1800 \
-	CMD stat /HEALTHY.status || exit 1
+    CMD stat /HEALTHY.status || exit 1
 
 CMD dockerize -wait tcp://${MYSQL_HOST}:${MYSQL_PORT} -timeout ${TIMEOUT} /run.sh

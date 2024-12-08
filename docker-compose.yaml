@@ -1,8 +1,9 @@
-version: "2"
 services:
   mariadb:
-    image: mariadb:10
+    image: mariadb:10.11
     container_name: my_mariadb
+    security_opt:
+      - seccomp:unconfined
     expose:
       - 3306
     volumes:
@@ -14,7 +15,7 @@ services:
       - MYSQL_ALLOW_EMPTY_ROOT_PASSWORD=yes
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "healthcheck.sh", "--su-mysql", "--connect"]
+      test: [ "CMD", "healthcheck.sh", "--su-mysql", "--connect" ]
       timeout: 5s
       retries: 10
 
@@ -34,6 +35,6 @@ services:
       - INIT_BACKUP=1
       - CRON_TIME=0 0 * * *
     restart: unless-stopped
-  
-volumes: 
+
+volumes:
   data:

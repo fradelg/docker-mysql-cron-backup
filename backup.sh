@@ -29,13 +29,7 @@ do
     echo "==> Dumping database: $db"
     FILENAME=/backup/$DATE.$db.sql
     LATEST=/backup/latest.$db.sql
-    BASIC_OPTS="--single-transaction"
-    if [ -n "$REMOVE_DUPLICATES" ]
-    then
-      echo "WARNING: disabling comments in backup to remove deuplicate backups. Automatic database name detection won't work so set MYSQL_DATABASE on restore"
-      BASIC_OPTS="$BASIC_OPTS" --skip-comments
-    fi
-    if mysqldump $BASIC_OPTS $MYSQLDUMP_OPTS -h "$MYSQL_HOST" -P "$MYSQL_PORT" -u "$MYSQL_USER" -p"$MYSQL_PASS" $MYSQL_SSL_OPTS "$db" > "$FILENAME"
+    if mysqldump --single-transaction --skip-dump-date $MYSQLDUMP_OPTS -h "$MYSQL_HOST" -P "$MYSQL_PORT" -u "$MYSQL_USER" -p"$MYSQL_PASS" $MYSQL_SSL_OPTS "$db" > "$FILENAME"
     then
       EXT=
       if [ -z "${USE_PLAIN_SQL}" ]

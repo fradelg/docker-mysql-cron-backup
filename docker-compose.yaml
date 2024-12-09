@@ -30,7 +30,6 @@ services:
     environment:
       - MYSQL_HOST=my_mariadb
       - MYSQL_USER=root
-      - MYSQL_DATABASE=${DATABASE_NAME}
       - MYSQL_PASS=${MARIADB_ROOT_PASSWORD}
       - MAX_BACKUPS=1
       - INIT_BACKUP=1

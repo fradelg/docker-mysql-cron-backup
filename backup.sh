@@ -32,8 +32,7 @@ do
     BASIC_OPTS="--single-transaction"
     if [ -n "$REMOVE_DUPLICATES" ]
     then
-      echo "WARNING: disabling comments in backup to remove deuplicate backups. Automatic database name detection won't work so set MYSQL_DATABASE on restore"
-      BASIC_OPTS="$BASIC_OPTS" --skip-comments
+      BASIC_OPTS="$BASIC_OPTS --skip-dump-date"
     fi
     if mysqldump $BASIC_OPTS $MYSQLDUMP_OPTS -h "$MYSQL_HOST" -P "$MYSQL_PORT" -u "$MYSQL_USER" -p"$MYSQL_PASS" $MYSQL_SSL_OPTS "$db" > "$FILENAME"
     then
@@ -52,7 +51,7 @@ do
       cd /backup || exit && ln -s "$BASENAME" "$(basename "$LATEST")"
       if [ -n "$REMOVE_DUPLICATES" ]
       then
-        echo "=> Removing duplicate database dumps"
+        echo "==> Removing duplicate database dumps"
         fdupes -idN /backup/
       fi
       if [ -n "$MAX_BACKUPS" ]

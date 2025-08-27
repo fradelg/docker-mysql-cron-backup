@@ -19,7 +19,7 @@ fi
 function final_backup {
     echo "=> Captured trap for final backup"
     echo "=> Requested last backup at $(date "+%Y-%m-%d %H:%M:%S")"
-    exec /backup.sh
+    /backup.sh
     exit 0
 }
 

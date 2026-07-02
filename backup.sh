@@ -15,6 +15,28 @@
 # Get level from env, else use 6
 [ -z "${GZIP_LEVEL}" ] && { GZIP_LEVEL=6; }
 
+# Get S3 access key/secret: try read from file, else get from env
+[ -z "${AWS_ACCESS_KEY_ID_FILE}" ] || { AWS_ACCESS_KEY_ID=$(head -1 "${AWS_ACCESS_KEY_ID_FILE}"); }
+[ -z "${AWS_SECRET_ACCESS_KEY_FILE}" ] || { AWS_SECRET_ACCESS_KEY=$(head -1 "${AWS_SECRET_ACCESS_KEY_FILE}"); }
+export AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY
+[ -z "${S3_REGION}" ] && { S3_REGION=us-east-1; }
+export AWS_DEFAULT_REGION="$S3_REGION"
+# S3_ENDPOINT allows using S3-compatible services (Cloudflare R2, MinIO, Backblaze B2, ...)
+AWS_CLI_OPTS=
+[ -n "${S3_ENDPOINT}" ] && AWS_CLI_OPTS="--endpoint-url $S3_ENDPOINT"
+
+upload_to_s3() {
+  LOCAL_FILE=$1
+  REMOTE_NAME=$2
+  S3_URI="s3://${S3_BUCKET}/${S3_PATH:+$S3_PATH/}${REMOTE_NAME}"
+  echo "==> Uploading $REMOTE_NAME to $S3_URI"
+  # shellcheck disable=SC2086
+  if ! aws $AWS_CLI_OPTS s3 cp "$LOCAL_FILE" "$S3_URI" $S3_UPLOAD_OPTS
+  then
+    echo "==> Failed to upload $REMOTE_NAME to $S3_URI"
+  fi
+}
+
 DATE=$(date +%Y%m%d%H%M)
 echo "=> Backup started at $(date "+%Y-%m-%d %H:%M:%S")"
 DATABASES=${MYSQL_DATABASE:-${MYSQL_DB:-$(mysql -h "$MYSQL_HOST" -P "$MYSQL_PORT" -u "$MYSQL_USER" -p"$MYSQL_PASS" $MYSQL_SSL_OPTS -e "SHOW DATABASES;" | tr -d "| " | grep -v Database)}}
@@ -49,6 +71,11 @@ do
       echo "==> Creating symlink to latest backup: $BASENAME"
       rm "$LATEST" 2> /dev/null
       cd /backup || exit && ln -s "$BASENAME" "$(basename "$LATEST")"
+      if [ -n "$S3_BUCKET" ]
+      then
+        upload_to_s3 "$FILENAME" "$BASENAME"
+        upload_to_s3 "$FILENAME" "$(basename "$LATEST")"
+      fi
       if [ -n "$REMOVE_DUPLICATES" ]
       then
         echo "==> Removing duplicate database dumps"

@@ -44,6 +44,40 @@ Container is **Healthy** after the database init phase, that is after `INIT_BACK
 - `TZ`: Specify TIMEZONE in Container. E.g. "Europe/Berlin". Default is UTC.
 - `REMOVE_DUPLICATES`: Use [fdupes](https://github.com/adrianlopezroche/fdupes) to remove duplicate database dumps
 
+### Uploading backups to S3 or S3-compatible services (Cloudflare R2, MinIO, Backblaze B2, ...)
+
+When `S3_BUCKET` is set, every dump is uploaded via the `aws` CLI right after it's created locally, both under its timestamped name and under `latest.<database>.sql[.gz]`. Local retention (`MAX_BACKUPS`, `REMOVE_DUPLICATES`) is unaffected: it only manages files inside `/backup`, the S3 upload just mirrors what's written there.
+
+- `S3_BUCKET`: Name of the bucket to upload backups to. If not set, no upload is performed.
+- `S3_PATH`: Optional key prefix inside the bucket, e.g. `my-project/backups`. Default: bucket root.
+- `S3_ENDPOINT`: Custom endpoint URL, required for S3-compatible services that aren't AWS, e.g. `https://<ACCOUNT_ID>.r2.cloudflarestorage.com` for Cloudflare R2.
+- `S3_REGION`: Region passed to the AWS CLI. Default: `us-east-1`. Some providers (e.g. Cloudflare R2) accept `auto`.
+- `AWS_ACCESS_KEY_ID` / `AWS_ACCESS_KEY_ID_FILE`: Access key used to authenticate. Use `_FILE` for docker secrets.
+- `AWS_SECRET_ACCESS_KEY` / `AWS_SECRET_ACCESS_KEY_FILE`: Secret key used to authenticate. Use `_FILE` for docker secrets.
+- `S3_UPLOAD_OPTS`: Extra command line arguments passed to `aws s3 cp` (e.g. `--storage-class STANDARD_IA`).
+
+Example using Cloudflare R2:
+
+```yaml
+  mysql-cron-backup:
+    image: fradelg/mysql-cron-backup
+    depends_on:
+      - mariadb
+    volumes:
+      - ${VOLUME_PATH}/backup:/backup
+    environment:
+      - MYSQL_HOST=my_mariadb
+      - MYSQL_USER=root
+      - MYSQL_PASS=${MARIADB_ROOT_PASSWORD}
+      - S3_BUCKET=my-backups
+      - S3_PATH=mysql
+      - S3_ENDPOINT=https://${CLOUDFLARE_ACCOUNT_ID}.r2.cloudflarestorage.com
+      - S3_REGION=auto
+      - AWS_ACCESS_KEY_ID=${R2_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${R2_SECRET_ACCESS_KEY}
+    restart: unless-stopped
+```
+
 If you want to make this image the perfect companion of your MySQL container, use [docker-compose](https://docs.docker.com/compose/). You can add more services that will be able to connect to the MySQL image using the name `my_mariadb`, note that you only expose the port `3306` internally to the servers and not to the host:
 
 ### Docker-compose with MYSQL_PASS env var:

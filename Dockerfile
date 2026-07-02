@@ -22,7 +22,8 @@ RUN apk add --update \
     openssl \
     mysql-client=~10.11 \
     mariadb-connector-c \
-    fdupes && \
+    fdupes \
+    aws-cli && \
     rm -rf /var/cache/apk/*
 
 COPY --from=binary /go/bin/dockerize /usr/local/bin

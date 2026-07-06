@@ -1,6 +1,6 @@
 services:
   mariadb:
-    image: mariadb:10.11
+    image: mariadb:11.4
     container_name: my_mariadb
     security_opt:
       - seccomp:unconfined

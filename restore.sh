@@ -35,7 +35,7 @@ fi
 
 echo "=> Restore database $DB_NAME from $1"
 
-if echo "$SQL" | mysql -h "$MYSQL_HOST" -P "$MYSQL_PORT" -u "$MYSQL_USER" -p"$MYSQL_PASS" $MYSQL_SSL_OPTS "$DB_NAME"
+if echo "$SQL" | mariadb -h "$MYSQL_HOST" -P "$MYSQL_PORT" -u "$MYSQL_USER" -p"$MYSQL_PASS" $MYSQL_SSL_OPTS "$DB_NAME"
 then
     echo "=> Restore succeeded"
 else

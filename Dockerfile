@@ -1,7 +1,7 @@
-FROM golang:1.20.4-alpine3.18 AS binary
+FROM golang:1.25.11-alpine3.23 AS binary
 RUN apk -U add openssl git
 
-ARG DOCKERIZE_VERSION=v0.7.0
+ARG DOCKERIZE_VERSION=v0.13.0
 WORKDIR /go/src/github.com/jwilder
 RUN git clone https://github.com/jwilder/dockerize.git && \
     cd dockerize && \
@@ -12,7 +12,7 @@ ENV GO111MODULE=on
 RUN go mod tidy
 RUN CGO_ENABLED=0 GOOS=linux GO111MODULE=on go build -a -o /go/bin/dockerize .
 
-FROM alpine:3.20.3
+FROM alpine:3.23
 LABEL maintainer="Fco. Javier Delgado del Hoyo <frandelhoyo@gmail.com>"
 
 RUN apk add --update \
@@ -20,7 +20,7 @@ RUN apk add --update \
     bash \
     gzip \
     openssl \
-    mysql-client=~10.11 \
+    mysql-client=~11.4 \
     mariadb-connector-c \
     fdupes \
     aws-cli && \

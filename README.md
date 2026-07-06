@@ -56,28 +56,6 @@ When `S3_BUCKET` is set, every dump is uploaded via the `aws` CLI right after it
 - `AWS_SECRET_ACCESS_KEY` / `AWS_SECRET_ACCESS_KEY_FILE`: Secret key used to authenticate. Use `_FILE` for docker secrets.
 - `S3_UPLOAD_OPTS`: Extra command line arguments passed to `aws s3 cp` (e.g. `--storage-class STANDARD_IA`).
 
-Example using Cloudflare R2:
-
-```yaml
-  mysql-cron-backup:
-    image: fradelg/mysql-cron-backup
-    depends_on:
-      - mariadb
-    volumes:
-      - ${VOLUME_PATH}/backup:/backup
-    environment:
-      - MYSQL_HOST=my_mariadb
-      - MYSQL_USER=root
-      - MYSQL_PASS=${MARIADB_ROOT_PASSWORD}
-      - S3_BUCKET=my-backups
-      - S3_PATH=mysql
-      - S3_ENDPOINT=https://${CLOUDFLARE_ACCOUNT_ID}.r2.cloudflarestorage.com
-      - S3_REGION=auto
-      - AWS_ACCESS_KEY_ID=${R2_ACCESS_KEY_ID}
-      - AWS_SECRET_ACCESS_KEY=${R2_SECRET_ACCESS_KEY}
-    restart: unless-stopped
-```
-
 If you want to make this image the perfect companion of your MySQL container, use [docker-compose](https://docs.docker.com/compose/). You can add more services that will be able to connect to the MySQL image using the name `my_mariadb`, note that you only expose the port `3306` internally to the servers and not to the host:
 
 ### Docker-compose with MYSQL_PASS env var:
@@ -192,6 +170,30 @@ services:
 volumes:
   data:
 
+```
+
+### Docker-compose uploading backups to S3-compatible storage:
+
+Example using Cloudflare R2:
+
+```yaml
+  mysql-cron-backup:
+    image: fradelg/mysql-cron-backup
+    depends_on:
+      - mariadb
+    volumes:
+      - ${VOLUME_PATH}/backup:/backup
+    environment:
+      - MYSQL_HOST=my_mariadb
+      - MYSQL_USER=root
+      - MYSQL_PASS=${MARIADB_ROOT_PASSWORD}
+      - S3_BUCKET=my-backups
+      - S3_PATH=mysql
+      - S3_ENDPOINT=https://${CLOUDFLARE_ACCOUNT_ID}.r2.cloudflarestorage.com
+      - S3_REGION=auto
+      - AWS_ACCESS_KEY_ID=${R2_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${R2_SECRET_ACCESS_KEY}
+    restart: unless-stopped
 ```
 
 ## Restore from a backup

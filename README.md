@@ -1,6 +1,17 @@
 # mysql-cron-backup
 
-Run mysqldump to backup your databases periodically using the cron task manager in the container. Your backups are saved in `/backup`. You can mount any directory of your host or a docker volumes in /backup. Othwerwise, a docker volume is created in the default location.
+Run mysqldump to backup your databases periodically using the cron task manager in the container. Your backups are saved in `/backup`. You can mount any directory of your host or a docker volume in `/backup`. Otherwise, a docker volume is created in the default location.
+
+## Table of Contents
+- [Usage](#usage)
+  - [Healthcheck](#healthcheck)
+- [Environment Variables](#variables)
+- [Uploading Backups to S3 or S3-Compatible Services](#uploading-backups-to-s3-or-s3-compatible-services-cloudflare-r2-minio-backblaze-b2-)
+- [Docker Compose Examples](#docker-compose-examples)
+  - [Docker-compose with MYSQL_PASS env var](#docker-compose-with-mysql_pass-env-var)
+  - [Docker-compose using docker secrets](#docker-compose-using-docker-secrets)
+  - [Docker-compose uploading backups to S3-compatible storage](#docker-compose-uploading-backups-to-s3-compatible-storage)
+- [Restore from a backup](#restore-from-a-backup)
 
 ## Usage:
 
@@ -8,41 +19,44 @@ Run mysqldump to backup your databases periodically using the cron task manager 
 docker container run -d \
        --env MYSQL_USER=root \
        --env MYSQL_PASS=my_password \
-       --link mysql
-       --volume /path/to/my/backup/folder:/backup
+       --link mysql \
+       --volume /path/to/my/backup/folder:/backup \
        fradelg/mysql-cron-backup
 ```
 
 ### Healthcheck
 
-
 Healthcheck is provided as a basic init control.
-Container is **Healthy** after the database init phase, that is after `INIT_BACKUP` or `INIT_RESTORE_LATEST` happends without check if there is an error, **Starting** otherwise. Not other checks are actually provided.
+Container is **Healthy** after the database init phase, that is after `INIT_BACKUP` or `INIT_RESTORE_LATEST` happens without checking if there is an error, **Starting** otherwise. No other checks are actually provided.
 
 ## Variables
 
-
-- `MYSQL_HOST`: The host/ip of your mysql database.
-- `MYSQL_HOST_FILE`: The file in container where to find the host of your mysql database (cf. docker secrets). You should use either MYSQL_HOST_FILE or MYSQL_HOST (see examples below).
-- `MYSQL_PORT`: The port number of your mysql database.
-- `MYSQL_USER`: The username of your mysql database.
-- `MYSQL_USER_FILE`: The file in container where to find the user of your mysql database (cf. docker secrets). You should use either MYSQL_USER_FILE or MYSQL_USER (see examples below).
-- `MYSQL_PASS`: The password of your mysql database.
-- `MYSQL_PASS_FILE`: The file in container where to find the password of your mysql database (cf. docker secrets). You should use either MYSQL_PASS_FILE or MYSQL_PASS (see examples below).
+### Database Connection
+- `MYSQL_HOST`: The host/IP of your MySQL database.
+- `MYSQL_HOST_FILE`: The file in the container where to find the host of your MySQL database (cf. Docker secrets). You should use either `MYSQL_HOST_FILE` or `MYSQL_HOST`.
+- `MYSQL_PORT`: The port number of your MySQL database.
+- `MYSQL_USER`: The username of your MySQL database.
+- `MYSQL_USER_FILE`: The file in the container where to find the username of your MySQL database (cf. Docker secrets). You should use either `MYSQL_USER_FILE` or `MYSQL_USER`.
+- `MYSQL_PASS`: The password of your MySQL database.
+- `MYSQL_PASS_FILE`: The file in the container where to find the password of your MySQL database (cf. Docker secrets). You should use either `MYSQL_PASS_FILE` or `MYSQL_PASS`.
 - `MYSQL_DATABASE`: The database name to dump. Default: `--all-databases`.
-- `MYSQL_DATABASE_FILE`: The file in container where to find the database name(s) in your mysql database (cf. docker secrets). In that file, there can be several database names: one per line. You should use either MYSQL_DATABASE or MYSQL_DATABASE_FILE (see examples below).
-- `MYSQLDUMP_OPTS`: Command line arguments to pass to mysqldump (see [mysqldump documentation](https://dev.mysql.com/doc/refman/8.0/en/mysqldump.html)).
-- `MYSQL_SSL_OPTS`: Command line arguments to use [SSL](https://dev.mysql.com/doc/refman/5.6/en/using-encrypted-connections.html).
+- `MYSQL_DATABASE_FILE`: The file in the container where to find the database name(s) in your MySQL database (cf. Docker secrets). In that file, there can be several database names: one per line. You should use either `MYSQL_DATABASE` or `MYSQL_DATABASE_FILE`.
+
+### Backup & Scheduling
 - `CRON_TIME`: The interval of cron job to run mysqldump. `0 3 * * sun` by default, which is every Sunday at 03:00. It uses UTC timezone.
 - `MAX_BACKUPS`: The number of backups to keep. When reaching the limit, the old backup will be discarded. No limit by default.
 - `INIT_BACKUP`: If set, create a backup when the container starts.
 - `INIT_RESTORE_LATEST`: If set, restores latest backup.
 - `EXIT_BACKUP`: If set, create a backup when the container stops.
 - `TIMEOUT`: Wait a given number of seconds for the database to be ready and make the first backup, `10s` by default. After that time, the initial attempt for backup gives up and only the Cron job will try to make a backup.
+
+### Options & Compression
+- `MYSQLDUMP_OPTS`: Command line arguments to pass to mysqldump (see [mysqldump documentation](https://dev.mysql.com/doc/refman/8.0/en/mysqldump.html)).
+- `MYSQL_SSL_OPTS`: Command line arguments to use [SSL](https://dev.mysql.com/doc/refman/5.6/en/using-encrypted-connections.html).
 - `GZIP_LEVEL`: Specify the level of gzip compression from 1 (quickest, least compressed) to 9 (slowest, most compressed), default is 6.
 - `USE_PLAIN_SQL`: If set, back up and restore plain SQL files without gzip.
-- `TZ`: Specify TIMEZONE in Container. E.g. "Europe/Berlin". Default is UTC.
-- `REMOVE_DUPLICATES`: Use [fdupes](https://github.com/adrianlopezroche/fdupes) to remove duplicate database dumps
+- `TZ`: Specify timezone in the container. E.g., `"Europe/Berlin"`. Default is UTC.
+- `REMOVE_DUPLICATES`: Use [fdupes](https://github.com/adrianlopezroche/fdupes) to remove duplicate database dumps.
 
 ### Uploading backups to S3 or S3-compatible services (Cloudflare R2, MinIO, Backblaze B2, ...)
 
@@ -56,12 +70,15 @@ When `S3_BUCKET` is set, every dump is uploaded via the `aws` CLI right after it
 - `AWS_SECRET_ACCESS_KEY` / `AWS_SECRET_ACCESS_KEY_FILE`: Secret key used to authenticate. Use `_FILE` for docker secrets.
 - `S3_UPLOAD_OPTS`: Extra command line arguments passed to `aws s3 cp` (e.g. `--storage-class STANDARD_IA`).
 
-If you want to make this image the perfect companion of your MySQL container, use [docker-compose](https://docs.docker.com/compose/). You can add more services that will be able to connect to the MySQL image using the name `my_mariadb`, note that you only expose the port `3306` internally to the servers and not to the host:
+If you want to make this image the perfect companion of your MySQL container, use [docker-compose](https://docs.docker.com/compose/). You can add more services that will be able to connect to the MySQL image using the name `my_mariadb`, note that you only expose the port `3306` internally to the servers and not to the host.
+
+> **Security Tip:** For production environments, prefer using Docker Secrets (`*_FILE` variables) or external `.env` files rather than writing plain-text passwords directly in compose files.
+
+## Docker Compose Examples
 
 ### Docker-compose with MYSQL_PASS env var:
 
 ```yaml
-version: "2"
 services:
   mariadb:
     image: mariadb
@@ -70,7 +87,7 @@ services:
       - 3306
     volumes:
       - data:/var/lib/mysql
-      # If there is not scheme, restore the last created backup (if exists)
+      # If there is no schema, restore the last created backup (if exists)
       - ${VOLUME_PATH}/backup/latest.${DATABASE_NAME}.sql.gz:/docker-entrypoint-initdb.d/database.sql.gz
     environment:
       - MYSQL_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}

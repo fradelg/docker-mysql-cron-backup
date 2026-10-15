@@ -30,4 +30,5 @@ jobs:
         run: |
           docker buildx build --push \
             --tag fradelg/mysql-cron-backup:${{ steps.docker-tag.outputs.tag }} \
+            --tag fradelg/mysql-cron-backup:latest \
             --platform linux/amd64,linux/arm/v7,linux/arm64 .

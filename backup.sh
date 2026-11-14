@@ -40,6 +40,12 @@ upload_to_s3() {
 DATE=$(date +%Y%m%d%H%M)
 echo "=> Backup started at $(date "+%Y-%m-%d %H:%M:%S")"
 DATABASES=${MYSQL_DATABASE:-${MYSQL_DB:-$(mariadb -h "$MYSQL_HOST" -P "$MYSQL_PORT" -u "$MYSQL_USER" -p"$MYSQL_PASS" $MYSQL_SSL_OPTS -e "SHOW DATABASES;" | tr -d "| " | grep -v Database)}}
+if [ -z "${DATABASES}" ]
+then
+  echo "=> ERROR: no databases to back up (the database list is empty or could not be read)"
+  exit 1
+fi
+FAILED=0
 for db in ${DATABASES}
 do
   if  [[ "$db" != "information_schema" ]] \
@@ -87,8 +93,15 @@ do
         /delete.sh "$db" $EXT
       fi
     else
+      echo "==> ERROR: failed to dump database: $db"
       rm -rf "$FILENAME"
+      FAILED=$((FAILED + 1))
     fi
   fi
 done
 echo "=> Backup process finished at $(date "+%Y-%m-%d %H:%M:%S")"
+if [ "$FAILED" -gt 0 ]
+then
+  echo "=> ERROR: $FAILED database(s) failed to back up"
+  exit 1
+fi
